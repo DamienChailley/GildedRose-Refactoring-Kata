@@ -13,77 +13,73 @@ public class GildedRose
 
     public void UpdateQuality()
     {
-        for (var i = 0; i < _items.Count; i++)
+        foreach (Item item in _items)
         {
-            if (_items[i].Name != "Aged Brie" && _items[i].Name != "Backstage passes to a TAFKAL80ETC concert")
+            if (item.Name != itemsConstants.AGED_BRIE && item.Name != itemsConstants.BACKSTAGE_PASSES)
             {
-                if (_items[i].Quality > 0)
+                if (item.Quality > 0 && item.Name != itemsConstants.SULFURAS)
                 {
-                    if (_items[i].Name != "Sulfuras, Hand of Ragnaros")
-                    {
-                        _items[i].Quality = _items[i].Quality - 1;
-                    }
+                    DecreaseQuality(item, 1);
                 }
             }
             else
             {
-                if (_items[i].Quality < 50)
+                if (item.Quality < 50)
                 {
-                    _items[i].Quality = _items[i].Quality + 1;
+                    item.Quality += 1;
 
-                    if (_items[i].Name == "Backstage passes to a TAFKAL80ETC concert")
+                    if (item.Name == itemsConstants.BACKSTAGE_PASSES && item.Quality < 50)
                     {
-                        if (_items[i].SellIn < 11)
+                        if (item.SellIn < 11)
                         {
-                            if (_items[i].Quality < 50)
-                            {
-                                _items[i].Quality = _items[i].Quality + 1;
-                            }
+                            item.Quality += 1;
                         }
 
-                        if (_items[i].SellIn < 6)
+                        if (item.SellIn < 6)
                         {
-                            if (_items[i].Quality < 50)
-                            {
-                                _items[i].Quality = _items[i].Quality + 1;
-                            }
+                            item.Quality += 1;
                         }
                     }
                 }
             }
 
-            if (_items[i].Name != "Sulfuras, Hand of Ragnaros")
-            {
-                _items[i].SellIn = _items[i].SellIn - 1;
-            }
+            UpdateSellin(item);
 
-            if (_items[i].SellIn < 0)
+            if (item.SellIn < 0)
             {
-                if (_items[i].Name != "Aged Brie")
+                if (item.Name != itemsConstants.AGED_BRIE)
                 {
-                    if (_items[i].Name != "Backstage passes to a TAFKAL80ETC concert")
+                    if (item.Name != itemsConstants.BACKSTAGE_PASSES)
                     {
-                        if (_items[i].Quality > 0)
+                        if (item.Quality > 0 && item.Name != itemsConstants.SULFURAS)
                         {
-                            if (_items[i].Name != "Sulfuras, Hand of Ragnaros")
-                            {
-                                _items[i].Quality = _items[i].Quality - 1;
-                            }
+                            DecreaseQuality(item,1);
                         }
                     }
                     else
                     {
-                        _items[i].Quality = _items[i].Quality - _items[i].Quality;
+                        item.Quality = 0;
                     }
                 }
-                else
+                else if (item.Quality < 50)
                 {
-                    if (_items[i].Quality < 50)
-                    {
-                        _items[i].Quality = _items[i].Quality + 1;
-                    }
+                    item.Quality += 1;
                 }
             }
         }
+    }
+
+    private void UpdateSellin(Item item)
+    {
+        if (item.Name != itemsConstants.SULFURAS)
+        {
+            item.SellIn -= 1;
+        }
+    }
+
+    private void DecreaseQuality(Item item, int nbToRemove)
+    {
+        int multiply = item.Name.Contains("Conjured") ? 2 : 1;
+        item.Quality -= nbToRemove * multiply;
     }
 }
