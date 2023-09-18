@@ -15,71 +15,85 @@ public class GildedRose
     {
         foreach (Item item in _items)
         {
-            if (item.Name != itemsConstants.AGED_BRIE && item.Name != itemsConstants.BACKSTAGE_PASSES)
-            {
-                if (item.Quality > 0 && item.Name != itemsConstants.SULFURAS)
-                {
-                    DecreaseQuality(item, 1);
-                }
-            }
-            else
-            {
-                if (item.Quality < 50)
-                {
-                    item.Quality += 1;
+            UpdateQuality(item);
+        }
+    }
 
-                    if (item.Name == itemsConstants.BACKSTAGE_PASSES && item.Quality < 50)
-                    {
-                        if (item.SellIn < 11)
-                        {
-                            item.Quality += 1;
-                        }
+    private void UpdateQuality(Item item)
+    {
+        if (item.Name == itemsConstants.SULFURAS)
+        {
+            return;
+        }
 
-                        if (item.SellIn < 6)
-                        {
-                            item.Quality += 1;
-                        }
-                    }
-                }
-            }
+        if (item.Name == itemsConstants.AGED_BRIE)
+        {
+            IncreaseQuality(item);
 
-            UpdateSellin(item);
+            item.SellIn -= 1;
 
             if (item.SellIn < 0)
             {
-                if (item.Name != itemsConstants.AGED_BRIE)
+                IncreaseQuality(item);
+            }
+        }
+        else if (item.Name == itemsConstants.BACKSTAGE_PASSES)
+        {
+            if (item.Quality < 50)
+            {
+                item.Quality += 1;
+                if (item.SellIn < 11)
                 {
-                    if (item.Name != itemsConstants.BACKSTAGE_PASSES)
-                    {
-                        if (item.Quality > 0 && item.Name != itemsConstants.SULFURAS)
-                        {
-                            DecreaseQuality(item,1);
-                        }
-                    }
-                    else
-                    {
-                        item.Quality = 0;
-                    }
+                    IncreaseQuality(item);
                 }
-                else if (item.Quality < 50)
+
+                if (item.SellIn < 6)
                 {
-                    item.Quality += 1;
+                    IncreaseQuality(item);
                 }
+            }
+            item.SellIn -= 1;
+
+            if (item.SellIn < 0)
+            {
+                item.Quality = 0;
+            }
+        }
+        else if (item.Name == "Conjured")
+        {
+            DecreaseQuality(item);
+            DecreaseQuality(item);
+            if (item.SellIn < 0)
+            {
+                DecreaseQuality(item);
+                DecreaseQuality(item);
+            }
+        }
+        else // default items.
+        {
+            DecreaseQuality(item);
+            item.SellIn -= 1;
+
+            if (item.SellIn < 0)
+            {
+                DecreaseQuality(item);
             }
         }
     }
 
-    private void UpdateSellin(Item item)
+    private void DecreaseQuality(Item item)
     {
-        if (item.Name != itemsConstants.SULFURAS)
+        if (item.Quality > 0)
         {
-            item.SellIn -= 1;
+            item.Quality -= 1;
         }
     }
 
-    private void DecreaseQuality(Item item, int nbToRemove)
+    private void IncreaseQuality(Item item)
     {
-        int multiply = item.Name.Contains("Conjured") ? 2 : 1;
-        item.Quality -= nbToRemove * multiply;
+        if (item.Quality < 50)
+        {
+            item.Quality += 1;
+        }
     }
 }
